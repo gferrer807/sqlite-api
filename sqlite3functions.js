@@ -11,50 +11,49 @@ let createDB = (res) => {
 }
 
 let seedDB = (res) => {
+	let timestamp = new Date();
 
-    // let sqlCreate = `create table books (
-    //     id INTEGER PRIMARY KEY,
-    //     title TEXT NOT NULL,
-    //     available BOOLEAN NOT NULL,
-    //     email TEXT,
-    //     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-    // )`;
+    let sqlCreate = `create table books (
+        id INTEGER PRIMARY KEY,
+        title TEXT NOT NULL,
+        available BOOLEAN NOT NULL,
+        email TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`;
 
-    // db.run(sqlCreate, function(err) {
-    //     if (err) {
-    //       console.log('err on making table - ', err.message)
-    //     }
-    //     console.log('Table made')
-    // });
-
-    let books = [
-        [1, 'Huckleberry Finn', true, null, Date.now()],
-        [2, 'Tom Sawyer', true, null, Date.now()],
-        [3, 'Dune', true, null, Date.now()],
-        [4, 'HP Lovecraft Best Works', true, null, Date.now()],
-        [5, 'IT', true, null, Date.now()],
-        [6, 'Harry Potter', true, null, Date.now()],
-        [7, 'If I Did It', true, null, Date.now()],
-        [8, 'Night', true, null, Date.now()]
-    ]
-
-    let sql = `insert into books (
-        id,
-        title,
-        available,
-        email,
-        timestamp
-    ) values (?,?,?,?,?)`
-
-    for (var i = 0; i < books.length; i++) {
-        db.run(sql, books[i], function(err) {
-            if (err) {
-              console.log(err.message);
-            }
-            console.log(`Rows inserted ${this.changes}`);
-        });
-    }
-
+    db.run(sqlCreate, function(err) {
+        if (err) {
+          console.log('err on making table - ', err.message)
+        }
+				let books = [
+					[1, 'Huckleberry Finn', true, null, timestamp.toISOString()],
+					[2, 'Tom Sawyer', true, null, timestamp.toISOString()],
+					[3, 'Dune', true, null, timestamp.toISOString()],
+					[4, 'HP Lovecraft Best Works', true, null, timestamp.toISOString()],
+					[5, 'IT', true, null, timestamp.toISOString()],
+					[6, 'Harry Potter', true, null, timestamp.toISOString()],
+					[7, 'If I Did It', true, null, timestamp.toISOString()],
+					[8, 'Night', true, null, timestamp.toISOString()]
+			]
+	
+			let sql = `insert into books (
+					id,
+					title,
+					available,
+					email,
+					timestamp
+			) values (?,?,?,?,?)`
+	
+			for (var i = 0; i < books.length; i++) {
+					db.run(sql, books[i], function(err) {
+							if (err) {
+								console.log(err.message);
+							}
+							console.log(`Rows inserted ${this.changes}`);
+					});
+			}
+		});
+		res.send('Database seeded')
     db.close();
 }
 
@@ -67,18 +66,20 @@ let requestBook = (req, res) => {
 		}
 
     db.serialize(() => {
+				let timestamp = new Date();
         db.get(`select * from books where title=(?)`, [req.body.title], (err, row) => {
 					if (err) {
 							console.error(err.message);
 					}
 					//check if available or not
+
 					if (row.available !== 1) {
 					//if filled, respond saying its not available
 							res.send('Sorry, this book is already requeested :(');
 					} else {
 					//else return that its available
-							let params = [req.body.email, 0, req.body.title];
-							db.run(`update books set email=?, available=? where title=?`, params, (err, row) => {
+							let params = [req.body.email, 0, timestamp.toISOString(), req.body.title];
+							db.run(`update books set email=?, available=?,timestamp=? where title=?`, params, (err) => {
 								if (err) {
 									console.log(err.message)
 								}
@@ -92,7 +93,7 @@ let requestBook = (req, res) => {
 							})
 					}
         });
-    })
+		})
 
 }
 
@@ -120,6 +121,8 @@ let retrieveBooks = (req, res) => {
 
 			}
 		})
+
+		db.close();
 }
 
 let deleteRequest = (req,res) => {
@@ -130,12 +133,14 @@ let deleteRequest = (req,res) => {
 			return;
 		}
 
-		db.run(`update books set available=1, email='' where id=?`, [req.body.id], (err, row) => {
+		db.run(`update books set available=1, email='',timestamp=? where id=?`, [Date.now(),req.body.id], (err, row) => {
 			if (err) {
 				console.log(err.message)
 			}
 			res.send({})
 		})
+
+		db.close();
 }
 
 module.exports = {

@@ -9,13 +9,13 @@ app.use(cors());
 app.use(bodyParser());
 
 
-app.get('/createDB', (req, res) => {
-    createDB(res);
-})
+// app.get('/createDB', (req, res) => {
+//     createDB(res);
+// })
 
-app.get('/seedDB', (req,res) => {
-    seedDB(res);
-})
+// app.get('/seedDB', (req,res) => {
+//     seedDB(res);
+// })
 
 app.get('/retrieve', (req, res) => {
     retrieveBooks(req,res);
