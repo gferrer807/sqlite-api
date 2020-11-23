@@ -17,9 +17,9 @@ app.get('/seedDB', (req, res) => {
     
 })
 
-app.get('/request', (req, res) => {
+app.get('/request', async (req, res) => {
     let {id} = req.body;
-    let books = booksController.retrieveBooks(id);
+    let books = await booksController.retrieveBooks(id);
     res.send(books);
 })
 

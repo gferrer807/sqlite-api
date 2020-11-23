@@ -20,7 +20,7 @@ let seedDB = () => {
 			title: item[1],
 			available: item[2],
 			email: item[3],
-			timestamp: item[4]
+			createdAt: item[4]
 		  })
 		  .then((data) => {
 			  console.log(data, ' - data')
@@ -35,7 +35,10 @@ let seedDB = () => {
 
 let requestBook = (email, title) => {
 
+    let timestamp = new Date();
+
     Book.findAll({
+		raw: true,
         where: {
           title: title
         }
@@ -45,13 +48,14 @@ let requestBook = (email, title) => {
             return('Sorry thats not a book we have')
         }
 
-        if(data.available !== 1) {
+        if(data[0].available !== 0) {
+			//console.log('data - available', data)
             return ('Sorry, this book is already requeested :(');
         } else {
             Book.update({
                 email: email,
                 available: 0,
-				timestamp: timestamp.toISOString(),
+				createdAt: timestamp.toISOString(),
 				title: title
             }, {where:  { title: title }})
             .then((data) => {
@@ -60,7 +64,7 @@ let requestBook = (email, title) => {
                     id: data.id,
                     available: data.available,
                     title: data.title,
-                    timestamp: data.timestamp
+                    createdAt: data.timestamp
                 })
             })
             .catch((err) => {
@@ -78,8 +82,12 @@ let requestBook = (email, title) => {
 
 let retrieveBooks = (id) => {
 	//check if id is present
+	if (!id) {
+		id = null;
+	}
 
 	Book.findAll({
+		raw: true,
 		where: {
 			id: id
 		}
@@ -90,11 +98,13 @@ let retrieveBooks = (id) => {
 		}
 
 		Book.findAll({
+			raw: true,
 			where: {
 				available: 0
 			}
 		})
 		.then((data) => {
+			console.log('get data - ', data[0])
 			return data;
 		})
 		.catch((err) => {
@@ -110,10 +120,11 @@ let retrieveBooks = (id) => {
 }
 
 let deleteRequest = (id) => {
+	let timestamp = new Date();
 	Book.update({
 		available: 1,
 		email: '',
-		timestamp: timestamp.toISOString()
+		updatedAt: timestamp.toISOString()
 	}, {where:  { id: id }})
 	.then((data) => {
 		console.log(data);
