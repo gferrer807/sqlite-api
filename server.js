@@ -11,8 +11,8 @@ app.use(cors());
 app.use(bodyParser());
 
 
-app.get('/seedDB', (req, res) => {
-    let seedResponse = booksController.seedDB();
+app.get('/seedDB', async (req, res) => {
+    let seedResponse = await booksController.seedDB();
     res.send(seedResponse);
     
 })
@@ -23,21 +23,21 @@ app.get('/request', async (req, res) => {
     res.send(books);
 })
 
-app.post('/request', (req, res) => {
+app.post('/request', async (req, res) => {
     let {email, title} = req.body;
     if (!validateEmailAndTitle(email, title)) {
         res.send('Error on inputs. Check that email and title are present and formatted correctly');
     }
-    let requestedBook = booksController.requestBook(email, title);
+    let requestedBook = await booksController.requestBook(email, title);
     res.send(requestedBook);
 })
 
-app.delete('/request', (req, res) => {
+app.delete('/request', async (req, res) => {
     let {id} = req.body;
     if (!validateIDIsPresent(id)) {
         res.send('Please submit an id')
     }
-    let deletedBook = booksController.deleteRequest(id);
+    let deletedBook = await booksController.deleteRequest(id);
     res.send(deletedBook);
 })
 
