@@ -23,17 +23,18 @@ let seedDB = () => {
 			createdAt: item[4]
 		  })
 		  .then((data) => {
-			  console.log(data, ' - data')
+			  res(data);
 		  })
 		  .catch((err) => {
 			  console.log(err.parent);
+			  rej(err.parent);
 		  })
     })
 
     return 'Database seeded'
 }
 
-let requestBook = (email, title) => {
+let requestBook = (email, title) => new Promise((res, rej) => {
 
     let timestamp = new Date();
 
@@ -45,42 +46,54 @@ let requestBook = (email, title) => {
     })
     .then((data) => {
         if(!data) {
-            return('Sorry thats not a book we have')
+            res('Sorry thats not a book we have')
         }
 
         if(data[0].available !== 0) {
 			//console.log('data - available', data)
-            return ('Sorry, this book is already requeested :(');
+            res('Sorry, this book is already requeested :(');
         } else {
             Book.update({
                 email: email,
-                available: 0,
+                available: 1,
 				createdAt: timestamp.toISOString(),
 				title: title
-            }, {where:  { title: title }})
+			}, 
+				{where:  { title: title }
+			})
             .then((data) => {
-                console.log(`Row(s) updated: ${this.changes}`);
-                return ({
-                    id: data.id,
-                    available: data.available,
-                    title: data.title,
-                    createdAt: data.timestamp
-                })
+				Book.findAll({
+					raw: true,
+					where: {
+					  title: title
+					}
+				})
+				.then((data) => {
+					res({
+						id: data[0].id,
+						available: data[0].available,
+						title: data[0].title,
+						createdAt: data[0].updatedAt
+					});
+				})
+				.catch((err) => {
+					rej(err.parent);
+				})
             })
             .catch((err) => {
-                console.error(err.message);
-				return err.message
+				console.log(err.parent);
+				rej(err.parent);
             })
         }
     })
     .catch((err) => {
-        console.error(err.message);
-		return err.message
+		console.log(err.parent);
+		rej(err.parent);
     })
 
-}
+});
 
-let retrieveBooks = (id) => {
+let retrieveBooks = (id) => new Promise((res, rej) => {
 	//check if id is present
 	if (!id) {
 		id = null;
@@ -94,7 +107,7 @@ let retrieveBooks = (id) => {
 	})
 	.then((data) => {
 		if (data) {
-
+			res(data);
 		}
 
 		Book.findAll({
@@ -104,37 +117,35 @@ let retrieveBooks = (id) => {
 			}
 		})
 		.then((data) => {
-			console.log('get data - ', data[0])
-			return data;
+			res(data);
 		})
 		.catch((err) => {
 			console.log(err.message)
-			return err.message;
+			rej(err.message);
 		})
 
 	})
 	.catch((err) => {
-		console.log(err.message)
-		return err.message;	
+		console.log(err.parent);
+		rej(err.parent);
 	})
-}
+});
 
-let deleteRequest = (id) => {
+let deleteRequest = (id) => new Promise((res, rej) => {
 	let timestamp = new Date();
 	Book.update({
-		available: 1,
+		available: 0,
 		email: '',
 		updatedAt: timestamp.toISOString()
 	}, {where:  { id: id }})
 	.then((data) => {
-		console.log(data);
-		return {};
+		res({});
 	})
 	.catch((err) => {
-		console.log(err.message)
-		return `Error on deletion ${err.message}`;
+		console.log(err.parent);
+		rej(`Error on deletion ${err.parent}`);
 	})
-}
+});
 
 // recreate();
 

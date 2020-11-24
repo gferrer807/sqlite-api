@@ -28,7 +28,9 @@ app.post('/request', async (req, res) => {
     if (!validateEmailAndTitle(email, title)) {
         res.send('Error on inputs. Check that email and title are present and formatted correctly');
     }
-    let requestedBook = await booksController.requestBook(email, title);
+    let requestedBook = await booksController.requestBook(email, title, (data) => {
+        console.log(data);
+    });
     res.send(requestedBook);
 })
 
@@ -37,7 +39,9 @@ app.delete('/request', async (req, res) => {
     if (!validateIDIsPresent(id)) {
         res.send('Please submit an id')
     }
-    let deletedBook = await booksController.deleteRequest(id);
+    let deletedBook = await booksController.deleteRequest(id, (data) => {
+        console.log(data, ' - data yo')
+    });
     res.send(deletedBook);
 })
 
