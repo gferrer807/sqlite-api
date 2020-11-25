@@ -1,6 +1,7 @@
 const Book = require("../models/books.js");
 
-let seedDB = () => {
+let seedDB = async () => new Promise((res, rej) => {
+	
     let timestamp = new Date();
 
     let books = [
@@ -12,10 +13,27 @@ let seedDB = () => {
         [6, 'Harry Potter', true, null, timestamp.toISOString()],
         [7, 'If I Did It', true, null, timestamp.toISOString()],
         [8, 'Night', true, null, timestamp.toISOString()]
+	];
+
+	let books2 = [
+		{
+			id: 1,
+			title: 'IT',
+			available: true,
+			email: null,
+			createdAt: timestamp.toISOString()
+		},
+		{
+			id: 2,
+			title: 'IT',
+			available: true,
+			email: null,
+			createdAt: timestamp.toISOString()
+		}
 	]
 
-    books.map((item) => {
-        return Book.create({
+    return books.map(async (item) => {
+        return await Book.bulkCreate({
 			id: item[0],
 			title: item[1],
 			available: item[2],
@@ -29,10 +47,8 @@ let seedDB = () => {
 			  console.log(err.parent);
 			  rej(err.parent);
 		  })
-    })
-
-    return 'Database seeded'
-}
+    });
+});
 
 let requestBook = (email, title) => new Promise((res, rej) => {
 

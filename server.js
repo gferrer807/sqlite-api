@@ -15,7 +15,7 @@ app.get('/seedDB', async (req, res) => {
     let seedResponse = await booksController.seedDB();
     res.send(seedResponse);
     
-})
+});
 
 app.get('/request', async (req, res) => {
     let {id} = req.body;
