@@ -1,4 +1,7 @@
 const Book = require("../models/books.js");
+const sequelize = require("../../db.js")
+const queryInterface = sequelize.getQueryInterface();
+
 
 let seedDB = async () => new Promise((res, rej) => {
 	
@@ -15,39 +18,23 @@ let seedDB = async () => new Promise((res, rej) => {
         [8, 'Night', true, null, timestamp.toISOString()]
 	];
 
-	let books2 = [
-		{
-			id: 1,
-			title: 'IT',
-			available: true,
-			email: null,
-			createdAt: timestamp.toISOString()
-		},
-		{
-			id: 2,
-			title: 'IT',
-			available: true,
-			email: null,
-			createdAt: timestamp.toISOString()
-		}
-	]
-
-    return books.map(async (item) => {
-        return await Book.bulkCreate({
+	let books_list = books.map((item) => {
+		return {
 			id: item[0],
 			title: item[1],
 			available: item[2],
 			email: item[3],
 			createdAt: item[4]
-		  })
-		  .then((data) => {
-			  res(data);
-		  })
-		  .catch((err) => {
-			  console.log(err.parent);
-			  rej(err.parent);
-		  })
-    });
+		}
+	});
+
+	return Book.bulkCreate(books_list)
+	.then((data) => {
+		res(data);
+	})
+	.catch((err) => {
+		rej(err.parent);
+	})
 });
 
 let requestBook = (email, title) => new Promise((res, rej) => {
