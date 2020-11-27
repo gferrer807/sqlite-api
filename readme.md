@@ -17,3 +17,5 @@ Routes were divided into 3 primary routes.
 2) `POST` `/request` this will make a post request to the API to reserve the specified book. If it is unavailable, it will relay that to the user.
 
 3) `DELETE` `/request` this will remove any current book request.
+
+4) `GET` `/seedDB` this will populate the DB with fake entries
