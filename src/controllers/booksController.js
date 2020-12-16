@@ -52,13 +52,13 @@ let requestBook = (email, title) => new Promise((res, rej) => {
             res('Sorry thats not a book we have')
         }
 
-        if(data[0].available !== 0) {
+        if(data[0].available !== 1) {
 			//console.log('data - available', data)
-            res('Sorry, this book is already requeested :(');
+            res('Sorry, this book is already requested :(');
         } else {
             Book.update({
                 email: email,
-                available: 1,
+                available: 0,
 				createdAt: timestamp.toISOString(),
 				title: title
 			}, 
@@ -137,7 +137,7 @@ let retrieveBooks = (id) => new Promise((res, rej) => {
 let deleteRequest = (id) => new Promise((res, rej) => {
 	let timestamp = new Date();
 	Book.update({
-		available: 0,
+		available: 1,
 		email: '',
 		updatedAt: timestamp.toISOString()
 	}, {where:  { id: id }})
