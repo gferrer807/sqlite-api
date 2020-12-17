@@ -48,7 +48,8 @@ let requestBook = (email, title) => new Promise((res, rej) => {
         }
     })
     .then((data) => {
-        if(!data) {
+		console.log(data.length, data, ' - data!!!!!!!')
+        if(data.length === 0) {
             res('Sorry thats not a book we have')
         }
 
